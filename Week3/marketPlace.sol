@@ -68,23 +68,26 @@ function getListingPrice()public view returns (uint256){
      * @param _tokenId the NFT to be sold
      * @dev requires the msg.sender to pay for the nft which is sent back to the initial seller
      */
-    function createMarketSale(uint256 _tokenId)public payable {
-        //Take the price  from the idToMarketItem mapping using the _tokenId
-       
-        //check if the msg.value is equal to the price **the msg.value is the price thats need to be paid by the buyer which was set by the nft seller
-        
-        //make the owner of the nft the msg.sender that is anyone calling this function
-        
-        //make the seller to be address(0) since its not up for sale
-        
-        //make isSold for the nft to be true
-        
-        //increment _itemSold
-        
-        //send the native currency thats the price to the seller of that nft
-        
+function createMarketSale(uint256 _tokenId) public payable {
+    MarketItem storage item = idToMarketItem[_tokenId];
 
-    }
+    // Check if the price matches
+    require(msg.value == item.price, "Please submit the asking price");
+
+    // Transfer ownership
+    item.owner = payable(msg.sender);
+    item.seller = payable(address(0));
+    item.isSold = true;
+
+    _itemsSold.increment();
+
+    // Transfer the payment to the seller
+    item.seller.transfer(msg.value);
+
+    // Transfer the NFT to the buyer
+    _transfer(address(this), msg.sender, _tokenId);
+}
+
     /****
      * @notice this function is used to get all nfts that are up for sale in the market place
      * @dev returns all the nfts that are owned by the marketplace on be half of sellers which returns an array of MArketItem[]
