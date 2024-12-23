@@ -231,6 +231,31 @@
 				"inputs": [
 					{
 						"indexed": true,
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "seller",
+						"type": "address"
+					}
+				],
+				"name": "TokenResold",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
 						"internalType": "address",
 						"name": "from",
 						"type": "address"
@@ -292,7 +317,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_tokenId",
+						"name": "tokenId",
 						"type": "uint256"
 					}
 				],
@@ -358,7 +383,7 @@
 							}
 						],
 						"internalType": "struct CeloDaoMarketPlace.MarketItem[]",
-						"name": "items",
+						"name": "",
 						"type": "tuple[]"
 					}
 				],
@@ -369,11 +394,11 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "_user",
+						"name": "user",
 						"type": "address"
 					}
 				],
-				"name": "fetchUserNFTS",
+				"name": "fetchUserNFTs",
 				"outputs": [
 					{
 						"components": [
@@ -404,7 +429,7 @@
 							}
 						],
 						"internalType": "struct CeloDaoMarketPlace.MarketItem[]",
-						"name": "items",
+						"name": "",
 						"type": "tuple[]"
 					}
 				],
@@ -447,7 +472,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "id",
+						"name": "",
 						"type": "uint256"
 					}
 				],
@@ -555,12 +580,12 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_tokenId",
+						"name": "tokenId",
 						"type": "uint256"
 					},
 					{
 						"internalType": "uint256",
-						"name": "_newPrice",
+						"name": "newPrice",
 						"type": "uint256"
 					}
 				],
@@ -1032,11 +1057,11 @@
 			]
 		},
 		"Week3/marketPlace.sol": {
-			"keccak256": "0xaa97f6b69b174160ef91166f56904be9c65ce179186e39d1fae2e66a141203a7",
+			"keccak256": "0x532229c97408f5415286f412215b2bf6d7ae9e49fa467868a2556608bb4f16d1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2378d4c9d3c791ed1912592494dff72ee8dc7ec1caecb24a5b0d36da68e066c2",
-				"dweb:/ipfs/QmTEdxqdoFLxgYuskKG1VatvdqvDjMky3htM3FzHYa5tg7"
+				"bzz-raw://8d619236b5c315cbc8e46b2ac6e3c0de61f08f8a3ffaee208e024d7ea67f16ac",
+				"dweb:/ipfs/QmUQKBJMKJzeM8puzYbJ8xNFCnhpMVpDLXcAuXgFBY1CWX"
 			]
 		}
 	},
