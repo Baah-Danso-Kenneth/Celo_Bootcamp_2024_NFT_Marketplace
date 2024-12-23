@@ -92,23 +92,20 @@ function createMarketSale(uint256 _tokenId) public payable {
      * @notice this function is used to get all nfts that are up for sale in the market place
      * @dev returns all the nfts that are owned by the marketplace on be half of sellers which returns an array of MArketItem[]
      */
-    function fetchMarketPlaceItems()public view returns(MarketItem[] memory items){
-        //get the total counts of all the nfts that have been sold * HINT -> _tokenIds.current()
-        
-        //get the difference between all the ntfs that have been minted aganist those that have been sold *HINT (_tokenIds.current()-_itemsSold.current())
-        
-        //create a fixed size array of the unsold nfts 
-            //Hint 
-            //items = new MarketItem[]((_tokenIds.current()-_itemsSold.current()));
-            //initialise an index to store nfts that are unsold
-            //HINT
-           // uint256 index=0;
+function fetchMarketPlaceItems() public view returns (MarketItem[] memory items) {
+    uint256 totalItems = _tokenIds.current();
+    uint256 unsoldCount = totalItems - _itemsSold.current();
+    items = new MarketItem[](unsoldCount);
+    uint256 index = 0;
 
-           //Perform a loop "for loop" to check if the owner at that index is the address(this) thats the market place
-
-           
-        
+    for (uint256 i = 0; i < totalItems; i++) {
+        if (idToMarketItem[i].owner == address(this)) {
+            items[index] = idToMarketItem[i];
+            index++;
+        }
     }
+}
+
 
     function fetchUserNFTS(address _user)public  view returns(MarketItem[] memory items){
         uint256 itemCount = _tokenIds.current();
