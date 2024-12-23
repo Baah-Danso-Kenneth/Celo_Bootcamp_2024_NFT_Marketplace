@@ -10,7 +10,7 @@ contract CeloDaoMarketPlace is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     Counters.Counter private _itemsSold;
-    
+
     uint256 public listingPrice = 0.0025 ether;
     address payable owner;
 
@@ -24,6 +24,18 @@ contract CeloDaoMarketPlace is ERC721URIStorage {
         bool isSold;
     }
 
+    struct Auction {
+        uint256 tokenId;
+        address payable seller;
+        uint256 startingPrice;
+        uint256 highestBid;
+        address payable highestBidder;
+        uint256 endTime;
+        bool isActive;
+    }
+
+    mapping(uint256 => Auction) public auctions;
+
     event MarketItemCreated(
         address indexed owner,
         address indexed seller,
@@ -32,6 +44,9 @@ contract CeloDaoMarketPlace is ERC721URIStorage {
     );
 
     event TokenResold(uint256 indexed tokenId, uint256 price, address indexed seller);
+    event AuctionStarted(uint256 indexed tokenId, uint256 startingPrice, uint256 endTime);
+    event BidPlaced(uint256 indexed tokenId, address indexed bidder, uint256 bidAmount);
+    event AuctionEnded(uint256 indexed tokenId, address winner, uint256 winningBid);
 
     constructor() ERC721("CELOAFRICADAO", "CAD") {
         owner = payable(msg.sender);
@@ -74,10 +89,59 @@ contract CeloDaoMarketPlace is ERC721URIStorage {
         });
 
         _transfer(msg.sender, address(this), tokenId);
-
         payable(owner).transfer(listingPrice);
 
         emit MarketItemCreated(address(this), msg.sender, tokenId, price);
+    }
+
+    function startAuction(
+        uint256 tokenId,
+        uint256 startingPrice,
+        uint256 duration
+    ) public {
+        require(msg.sender == ownerOf(tokenId), "Only owner can start an auction");
+        require(duration > 0, "Auction duration must be greater than zero");
+
+        _transfer(msg.sender, address(this), tokenId);
+
+        auctions[tokenId] = Auction({
+            tokenId: tokenId,
+            seller: payable(msg.sender),
+            startingPrice: startingPrice,
+            highestBid: 0,
+            highestBidder: payable(address(0)),
+            endTime: block.timestamp + duration,
+            isActive: true
+        });
+    }
+
+    function placeBid(uint256 tokenId) public payable {
+        Auction storage auction = auctions[tokenId];
+        require(auction.isActive, "Auction is not active");
+        require(block.timestamp < auction.endTime, "Auction has ended");
+        require(msg.value > auction.highestBid, "Bid must be higher than current highest bid");
+
+        if (auction.highestBid > 0) {
+            auction.highestBidder.transfer(auction.highestBid);
+        }
+
+        auction.highestBid = msg.value;
+        auction.highestBidder = payable(msg.sender);
+    }
+
+    function endAuction(uint256 tokenId) public {
+        Auction storage auction = auctions[tokenId];
+        require(block.timestamp >= auction.endTime, "Auction is still ongoing");
+        require(auction.isActive, "Auction is not active");
+
+        auction.isActive = false;
+
+        if (auction.highestBid > 0) {
+            auction.seller.transfer(auction.highestBid);
+            _transfer(address(this), auction.highestBidder, tokenId);
+        } else {
+            _transfer(address(this), auction.seller, tokenId);
+        }
     }
 
     function resaleToken(uint256 tokenId, uint256 newPrice) public payable {
@@ -105,16 +169,13 @@ contract CeloDaoMarketPlace is ERC721URIStorage {
         require(msg.value == item.price, "Submit the asking price");
         require(item.owner == address(this), "Item not available for sale");
 
-        // Transfer funds to seller first
         item.seller.transfer(msg.value);
 
-        // Update ownership
         item.owner = payable(msg.sender);
         item.seller = payable(address(0));
         item.isSold = true;
 
         _itemsSold.increment();
-
         _transfer(address(this), msg.sender, tokenId);
     }
 
